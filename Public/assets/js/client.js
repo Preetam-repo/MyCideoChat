@@ -66,11 +66,6 @@ socket.on("user_list", (users) => {
     });
     online_users_list.innerHTML = html;
   }
-
-  // user = document.getElementById("user");
-  // user.addEventListener("click", () => {
-  //   console.log("clicked");
-  // });
 });
 
 pc.ontrack = function (event) {

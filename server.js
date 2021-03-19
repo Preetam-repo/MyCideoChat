@@ -16,11 +16,11 @@ let Users = new Map();
 io.on("connection", (socket) => {
   //add users // everytime a new user added the new array of users is sended to every client
   socket.on("add_user", (username) => {
-    Users.set(username, socket.id);
+    Users.set(socket.id, username);
     console.log(Users);
     let users_arr = [];
-    for (let k of Users.keys()) {
-      users_arr.push(k);
+    for (let v of Users.values()) {
+      users_arr.push(v);
     }
     io.emit("user_list", users_arr);
   });
@@ -32,11 +32,26 @@ io.on("connection", (socket) => {
   //   });
 
   socket.on("make-offer", ({ offer, to }) => {
-    to_socketId = getSocketId(to);
-    socket.to(to_socketId).emit("offer-made", {
+    let to_socketId = [...Users.entries()]
+      .filter(({ 1: v }) => v === to)
+      .map(([k]) => k);
+    console.log(...to_socketId);
+
+    socket.to(...to_socketId).emit("offer-made", {
       offer: offer,
       socket: socket.id,
     });
+  });
+
+  socket.on("disconnect", () => {
+    // this.socketsArray.splice(this.socketsArray.indexOf(socket.id), 1);
+    Users.delete(socket.id);
+    console.log(Users);
+    let users_arr = [];
+    for (let v of Users.values()) {
+      users_arr.push(v);
+    }
+    io.emit("user_list", users_arr);
   });
 
   socket.on("make-answer", (data) => {
